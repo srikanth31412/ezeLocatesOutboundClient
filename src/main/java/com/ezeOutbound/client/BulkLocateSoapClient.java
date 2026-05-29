@@ -1,29 +1,97 @@
 package com.ezeOutbound.client;
 
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
+import org.springframework.ws.WebServiceMessage;
+import org.springframework.ws.client.WebServiceTransportException;
+import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.SoapMessage;
+import org.springframework.ws.soap.client.SoapFaultClientException;
+import org.springframework.ws.soap.saaj.SaajSoapMessage;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class BulkLocateSoapClient extends WebServiceGatewaySupport {
 
-    public String sendBulkLocateRequest() {
+    private static final String ENDPOINT = "https://apibeta.cantorps.com/ezelocates";
 
-        String soapRequest = buildSoapRequest();
+    private static final String SOAP_ACTION = "https://apibeta.cantorps.com/ezelocates";
 
-        Source requestPayload = new StreamSource(new StringReader(soapRequest));
-        StringResult responseResult = new StringResult();
+    private static final String REQUEST_XML_FILE = "BulkLocateRequest.xml";
 
-        getWebServiceTemplate().sendSourceAndReceiveToResult(requestPayload, responseResult);
 
-        return responseResult.toString();
+    public void sendBulkLocateRequest() {
 
+        try{
+            String soapRequest = loadXmlFromClassPath(REQUEST_XML_FILE);
+
+            WebServiceTemplate template = getWebServiceTemplate();
+
+            WebServiceMessage responseMessage = template.sendAndReceive(ENDPOINT,
+                    requestMessage -> {
+                        try {
+                            replaceSoapMessageWithRawEnvelope(requestMessage, soapRequest);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        SoapMessage soapMessage = (SoapMessage) requestMessage;
+                        soapMessage.setSoapAction(SOAP_ACTION);
+                    },
+                    response -> response
+            );
+            if(responseMessage != null){
+                 String responseXml = convertResponseToString(responseMessage);
+            }
+        }
+        catch (SoapFaultClientException e){
+           System.out.println("Fault reason:"+ e.getFaultStringOrReason());
+           e.printStackTrace();
+
+        }
+        catch (WebServiceTransportException e){
+            System.out.println("Message:"+ e.getMessage());
+            e.printStackTrace();
+        }
+        catch (Exception e){
+            System.out.println("Error sending SOAP request: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    private String loadXmlFromClassPath(String fileName) throws Exception {
+        ClassPathResource resource = new ClassPathResource(fileName);
+        return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+    }
+
+    private void replaceSoapMessageWithRawEnvelope(WebServiceMessage message, String rawEnvelope) throws Exception {
+        if(!(message instanceof SaajSoapMessage)) {
+            throw new IllegalArgumentException("Expected a SaajSoapMessage");
+        }
+
+        SaajSoapMessage saajSoapMessage = (SaajSoapMessage) message;
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        SOAPMessage soapMessage = messageFactory.createMessage(null, new ByteArrayInputStream(rawEnvelope.getBytes(StandardCharsets.UTF_8)));
+        saajSoapMessage.setSaajMessage(soapMessage);
+    }
+
+    private String convertResponseToString(WebServiceMessage responseMessage) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        responseMessage.writeTo(outputStream);
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
     }
 
     private String buildSoapRequest() {

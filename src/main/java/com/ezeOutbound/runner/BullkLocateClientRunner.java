@@ -18,11 +18,11 @@ public class BullkLocateClientRunner implements CommandLineRunner {
 
         try{
             System.out.println("Calling Bulk Locate SOAP Client...");
-            String response = bulkLocateSoapClient.sendBulkLocateRequest();
-            System.out.println("SOAP response: " + response);
+            bulkLocateSoapClient.sendBulkLocateRequest();
         }
         catch (Exception e) {
-            System.err.println("Error calling Bulk Locate SOAP Client: " + e.getMessage());
+            System.out.println("Error calling Bulk Locate SOAP Client: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

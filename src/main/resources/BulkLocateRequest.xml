@@ -1,0 +1,67 @@
+<SOAP-ENV:ENVELOPE xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+
+    <SOAP-ENV:Body>
+<SOAP-ENV:BulkLocateRequest>
+
+    <SOAP-ENV:BulkLocateID>
+        {894E6730-6F19-4001-AS38-E7FF6C141563}
+    </SOAP-ENV:BulkLocateID>
+
+    <SOAP-ENV:BulkNumber>
+        2
+    </SOAP-ENV:BulkNumber>
+
+    <SOAP-ENV:SiteID>
+        36OneDemo
+    </SOAP-ENV:SiteID>
+
+    <SOAP-ENV:ReplyURL>
+        https://locateuat.ezecastlesoftare.com/locatehub.locateservice/locateservice.svc/REST/ProcessResponsesXml
+    </SOAP-ENV:ReplyURL>
+
+    <SOAP-ENV:LocateRequest>
+
+        <SOAP-ENV:LocateID>
+            {9FFF51CB2-5EB7-5658-USPB1-F4B651FFF8D3E}
+        </SOAP-ENV:LocateID>
+
+        <SOAP-ENV:SecurityID>
+            AAPL US
+        </SOAP-ENV:SecurityID>
+
+        <SOAP-ENV:SecurityType>
+            SYMBOL
+        </SOAP-ENV:SecurityType>
+
+        <SOAP-ENV:Symbol>
+            AAPL US
+        </SOAP-ENV:Symbol>
+
+        <SOAP-ENV:Amount>
+            20
+        </SOAP-ENV:Amount>
+
+        <SOAP-ENV:SettlementDate>
+            12/29/2022 12:00:00 AM
+        </SOAP-ENV:SettlementDate>
+
+        <SOAP-ENV:TimeOut>
+            12/27/2022 12:00:00 AM
+        </SOAP-ENV:TimeOut>
+
+        <SOAP-ENV:Trader>
+            OPS
+        </SOAP-ENV:Trader>
+
+        <SOAP-ENV:Message>
+            Test locate request
+        </SOAP-ENV:Message>
+
+        <SOAP-ENV:OnBehalfOf>
+        </SOAP-ENV:OnBehalfOf>
+
+    </SOAP-ENV:LocateRequest>
+
+</SOAP-ENV:BulkLocateRequest>
+    </SOAP-ENV:Body>
+</SOAP-ENV:ENVELOPE>
